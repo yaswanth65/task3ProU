@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import fs from 'fs';
 
 import { connectDB } from './config/database.js';
 import { setupSocketHandlers } from './socket/index.js';
@@ -52,9 +53,19 @@ const io = new Server(httpServer, {
 // Make io accessible to routes
 app.set('io', io);
 
-// Security middleware
+// Security middleware - configure Helmet to allow inline styles and scripts for SPA
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:", "https:"],
+      connectSrc: ["'self'", "wss:", "ws:"],
+    },
+  } : false,
 }));
 
 // CORS configuration
@@ -112,17 +123,30 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 if (process.env.NODE_ENV === 'production') {
   const publicPath = path.join(process.cwd(), 'public');
   
+  // Log static file path for debugging
+  console.log('📁 Static files path:', publicPath);
+  console.log('📁 Public folder exists:', fs.existsSync(publicPath));
+  if (fs.existsSync(publicPath)) {
+    console.log('📁 Public folder contents:', fs.readdirSync(publicPath));
+    const assetsPath = path.join(publicPath, 'assets');
+    if (fs.existsSync(assetsPath)) {
+      console.log('📁 Assets folder contents:', fs.readdirSync(assetsPath));
+    }
+  }
+  
   // Serve static assets with proper MIME types
   app.use(express.static(publicPath, {
     maxAge: '1d',
     setHeaders: (res, filePath) => {
       // Set proper content types for assets
       if (filePath.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
       } else if (filePath.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
       } else if (filePath.endsWith('.svg')) {
         res.setHeader('Content-Type', 'image/svg+xml');
+      } else if (filePath.endsWith('.html')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
       }
     }
   }));
@@ -138,10 +162,33 @@ app.use('/api/upload', uploadRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const publicPath = path.join(process.cwd(), 'public');
+  let publicExists = false;
+  let publicFiles: string[] = [];
+  let assetsFiles: string[] = [];
+  
+  try {
+    publicExists = fs.existsSync(publicPath);
+    if (publicExists) {
+      publicFiles = fs.readdirSync(publicPath);
+      const assetsPath = path.join(publicPath, 'assets');
+      if (fs.existsSync(assetsPath)) {
+        assetsFiles = fs.readdirSync(assetsPath);
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
+    cwd: process.cwd(),
+    publicPath,
+    publicExists,
+    publicFiles,
+    assetsFiles,
   });
 });
 
