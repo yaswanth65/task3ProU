@@ -1,0 +1,74 @@
+# Render Infrastructure as Code Configuration
+# This file enables one-click deployment to Render
+# Just connect your GitHub repo and Render will auto-deploy using this config
+
+services:
+  # MongoDB Database - Optional (comment out if using MongoDB Atlas)
+  - type: mongodb
+    name: taskflow-db
+    region: oregon
+    plan: free
+    ipWhitelist: []
+
+  # Backend API Service
+  - type: web
+    name: taskflow-backend
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: taskflow-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+    healthCheckPath: /api/health
+    autoDeploy: true
+    dependencies:
+      - taskflow-db
+
+  # Frontend Static Site
+  - type: static
+    name: taskflow-frontend
+    runtime: static
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_SOCKET_URL
+        sync: false
+    autoDeploy: true
+    routes:
+      - path: /
+        destination: /index.html
+
+# Define environment variable relationships
+envVarGroups:
+  - name: Backend Configuration
+    envVars:
+      - key: FRONTEND_URL
+        value: https://taskflow-frontend.onrender.com
+  - name: Frontend Configuration
+    envVars:
+      - key: VITE_API_URL
+        value: https://taskflow-backend.onrender.com/api
+      - key: VITE_SOCKET_URL
+        value: https://taskflow-backend.onrender.com

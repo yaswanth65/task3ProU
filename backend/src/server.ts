@@ -130,13 +130,14 @@ setupSocketHandlers(io);
 
 // Start server
 const PORT = parseInt(process.env.PORT || '5000');
+const HOST = process.env.HOST || '0.0.0.0';
 
 const startServer = async () => {
   try {
     await connectDB();
     
-    httpServer.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    httpServer.listen(PORT, HOST, () => {
+      console.log(`🚀 Server running on ${HOST}:${PORT}`);
       console.log(`📡 WebSocket server ready`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
     });

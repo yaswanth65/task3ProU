@@ -39,8 +39,12 @@ RUN mkdir -p uploads
 ENV NODE_ENV=production
 ENV PORT=5000
 
-# Expose port
-EXPOSE 5000
+# Expose port (Render expects PORT environment variable)
+EXPOSE $PORT
+
+# Health check for Render
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:' + process.env.PORT + '/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 # Start the server
 CMD ["node", "dist/server.js"]
