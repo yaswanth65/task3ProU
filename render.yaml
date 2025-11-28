@@ -1,74 +1,66 @@
-# Render Infrastructure as Code Configuration
-# This file enables one-click deployment to Render
-# Just connect your GitHub repo and Render will auto-deploy using this config
+# =============================================================================
+# Render Blueprint - Infrastructure as Code
+# =============================================================================
+# This file enables ONE-CLICK deployment to Render
+# Simply connect your GitHub repo and Render will auto-deploy using this config
+#
+# HOW IT WORKS:
+# 1. Go to Render Dashboard -> New -> Blueprint
+# 2. Connect your GitHub repository
+# 3. Render auto-detects this render.yaml file
+# 4. All services are created and configured automatically
+# =============================================================================
 
 services:
-  # MongoDB Database - Optional (comment out if using MongoDB Atlas)
-  - type: mongodb
-    name: taskflow-db
-    region: oregon
-    plan: free
-    ipWhitelist: []
-
-  # Backend API Service
+  # =============================================================================
+  # TaskFlow Full-Stack Application (Single Docker Container)
+  # =============================================================================
+  # This runs both frontend and backend in one container for simplicity
+  # Frontend is served as static files, backend handles API requests
+  # =============================================================================
   - type: web
-    name: taskflow-backend
-    runtime: node
+    name: taskflow
+    runtime: docker
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm start
+    # Render auto-detects Dockerfile at root
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    # Environment variables
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
+        value: 10000
       - key: MONGODB_URI
-        fromDatabase:
-          name: taskflow-db
-          property: connectionString
+        sync: false  # Set this manually in Render dashboard (use MongoDB Atlas)
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        sync: false
+        value: https://taskflow.onrender.com
       - key: RATE_LIMIT_WINDOW_MS
         value: 900000
       - key: RATE_LIMIT_MAX_REQUESTS
         value: 100
+    # Health check endpoint
     healthCheckPath: /api/health
+    # Auto-deploy on push to main branch
     autoDeploy: true
-    dependencies:
-      - taskflow-db
 
-  # Frontend Static Site
-  - type: static
-    name: taskflow-frontend
-    runtime: static
-    region: oregon
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false
-      - key: VITE_SOCKET_URL
-        sync: false
-    autoDeploy: true
-    routes:
-      - path: /
-        destination: /index.html
-
-# Define environment variable relationships
-envVarGroups:
-  - name: Backend Configuration
-    envVars:
-      - key: FRONTEND_URL
-        value: https://taskflow-frontend.onrender.com
-  - name: Frontend Configuration
-    envVars:
-      - key: VITE_API_URL
-        value: https://taskflow-backend.onrender.com/api
-      - key: VITE_SOCKET_URL
-        value: https://taskflow-backend.onrender.com
+# =============================================================================
+# IMPORTANT: MongoDB Setup
+# =============================================================================
+# Render's free tier doesn't include MongoDB. You need to:
+# 1. Create a FREE MongoDB Atlas cluster at https://www.mongodb.com/atlas
+# 2. Get your connection string
+# 3. Add it as MONGODB_URI environment variable in Render dashboard
+#
+# MongoDB Atlas Free Tier Setup:
+# 1. Sign up at mongodb.com/atlas
+# 2. Create a free M0 cluster
+# 3. Create a database user
+# 4. Whitelist 0.0.0.0/0 for access from Render
+# 5. Get connection string: mongodb+srv://user:pass@cluster.mongodb.net/taskflow
+# =============================================================================

@@ -1,5 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
+// In production, connect to same origin (empty string)
+// In development, use VITE_WS_URL or default to empty (same origin)
 const WS_URL = import.meta.env.VITE_WS_URL || '';
 
 class SocketManager {

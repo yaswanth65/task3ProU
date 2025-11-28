@@ -38,6 +38,7 @@ git push origin main
 ### Step 3: Render Auto-Detects Configuration
 
 ✅ Render will automatically:
+
 - Read your `render.yaml` file
 - Deploy Backend API service
 - Deploy Frontend static site
@@ -82,6 +83,7 @@ git push origin main
 Your project now includes everything needed:
 
 ### `render.yaml` - Infrastructure as Code
+
 - Defines all 3 services automatically
 - Specifies build commands
 - Sets up environment variables
@@ -89,17 +91,20 @@ Your project now includes everything needed:
 - Enables auto-deploy from GitHub
 
 ### `.env.example` - Environment Template
+
 - All required environment variables
 - Copy to `.env` locally
 - Never commit `.env` (add to `.gitignore`)
 
 ### Updated `Dockerfiles`
+
 - Render-compatible port configuration
 - Health checks included
 - Production-optimized builds
 - WebSocket support
 
 ### `render-build.sh` - Build Script
+
 - Automated build process
 - Compiles both backend and frontend
 - Installs dependencies in correct order
@@ -135,6 +140,7 @@ VITE_SOCKET_URL=https://taskflow-backend.onrender.com
 ## 📊 What Gets Deployed
 
 ### Backend Service
+
 - **Runtime**: Node.js 20
 - **Build**: `cd backend && npm install && npm run build`
 - **Start**: `cd backend && npm start`
@@ -142,12 +148,14 @@ VITE_SOCKET_URL=https://taskflow-backend.onrender.com
 - **URL**: `https://taskflow-backend.onrender.com`
 
 ### Frontend Service
+
 - **Type**: Static site
 - **Build**: `cd frontend && npm install && npm run build`
 - **Publish Path**: `frontend/dist`
 - **URL**: `https://taskflow-frontend.onrender.com`
 
 ### Database Service (Optional)
+
 - **Type**: MongoDB (free plan)
 - **Region**: Oregon
 - **Connection**: Auto-linked to backend
@@ -196,16 +204,19 @@ TTL: 3600
 ## 🔐 Security Best Practices
 
 ### JWT Secret
+
 - ✅ Render auto-generates secure JWT_SECRET
 - ✅ Different for each deployment
 - ❌ Never commit real secrets to GitHub
 
 ### MongoDB Connection
+
 - ✅ Use MongoDB Atlas for production
 - ✅ Restrict IP whitelist to Render IPs
 - ✅ Enable SSL/TLS connections
 
 ### Environment Variables
+
 - ✅ Set all sensitive vars in Render Dashboard
 - ✅ Use `.env.example` (without secrets)
 - ✅ Never commit `.env` file
@@ -272,6 +283,7 @@ Error: npm ERR! code ERESOLVE
 ```
 
 **Solution:**
+
 - Update `package.json` dependencies
 - Test locally: `npm install`
 - Push to GitHub
@@ -284,6 +296,7 @@ Error: Cannot find module 'express'
 ```
 
 **Solution:**
+
 1. Check `backend/package.json` exists
 2. Verify build command: `npm run build`
 3. Check `start` script: `node dist/server.js`
@@ -296,6 +309,7 @@ VITE_API_URL not set
 ```
 
 **Solution:**
+
 1. Go to Frontend Service Settings
 2. Add Environment Variables:
    - `VITE_API_URL=https://taskflow-backend.onrender.com/api`
@@ -309,6 +323,7 @@ MongoNetworkError: failed to connect
 ```
 
 **Solution:**
+
 1. Verify `MONGODB_URI` set correctly
 2. Check MongoDB Atlas IP whitelist
 3. Add Render's IPs to whitelist
@@ -321,6 +336,7 @@ Failed to connect to socket
 ```
 
 **Solution:**
+
 1. Verify `VITE_SOCKET_URL` set in frontend
 2. Check backend serving socket.io on `/socket.io`
 3. Verify CORS allows frontend origin
@@ -331,6 +347,7 @@ Failed to connect to socket
 ## 📈 Performance Optimization
 
 ### For Free Plan
+
 - ✅ Reasonable performance for small teams
 - ❌ Services spin down after 15 min inactivity
 - ❌ Limited to 750 build minutes/month
@@ -378,12 +395,14 @@ taskflow/
 ### After Successful Deployment
 
 1. **Test the application**
+
    - Visit frontend URL
    - Login with demo credentials
    - Create a task
    - Send a message
 
 2. **Set up monitoring**
+
    - Enable email alerts
    - Add custom domain
    - Configure SSL
@@ -399,16 +418,19 @@ taskflow/
 ## 💡 Pro Tips
 
 ### Faster Deployments
+
 - Keep dependencies updated
 - Use `npm ci` instead of `npm install` (deterministic)
 - Avoid large files in repo (use `.gitignore`)
 
 ### Better Monitoring
+
 - Set up Sentry for error tracking
 - Use LogRocket for session replay
 - Enable Render alerts
 
 ### Cost Optimization
+
 - Free tier good for development
 - Use shared databases initially
 - Scale horizontally with load balancers
