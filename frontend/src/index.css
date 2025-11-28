@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* Custom utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-in {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Calendar styles override */
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: inherit !important;
+  background: transparent !important;
+}
+
+.react-calendar__tile {
+  padding: 0.75rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.react-calendar__tile:enabled:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.react-calendar__tile--active {
+  background: #0ea5e9 !important;
+  color: white !important;
+}
+
+.react-calendar__tile--now {
+  background: #e0f2fe !important;
+}
+
+.react-calendar__navigation button {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* Drag and drop styles */
+.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+}
+
+.drop-target {
+  background-color: #e0f2fe;
+  border: 2px dashed #0ea5e9;
+}
+
+/* Priority badge colors */
+.priority-urgent {
+  @apply bg-red-100 text-red-700 border-red-200;
+}
+
+.priority-high {
+  @apply bg-orange-100 text-orange-700 border-orange-200;
+}
+
+.priority-medium {
+  @apply bg-yellow-100 text-yellow-700 border-yellow-200;
+}
+
+.priority-low {
+  @apply bg-green-100 text-green-700 border-green-200;
+}
+
+/* Status colors */
+.status-backlog {
+  @apply bg-slate-100 text-slate-600;
+}
+
+.status-todo {
+  @apply bg-blue-100 text-blue-600;
+}
+
+.status-in_progress {
+  @apply bg-amber-100 text-amber-600;
+}
+
+.status-in_review {
+  @apply bg-purple-100 text-purple-600;
+}
+
+.status-done {
+  @apply bg-green-100 text-green-600;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
