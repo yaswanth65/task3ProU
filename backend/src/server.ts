@@ -91,9 +91,24 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Serve frontend static files in production
+// IMPORTANT: This must come BEFORE API routes to properly serve CSS/JS with correct MIME types
 if (process.env.NODE_ENV === 'production') {
   const publicPath = path.join(process.cwd(), 'public');
-  app.use(express.static(publicPath));
+  
+  // Serve static assets with proper MIME types
+  app.use(express.static(publicPath, {
+    maxAge: '1d',
+    setHeaders: (res, filePath) => {
+      // Set proper content types for assets
+      if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+    }
+  }));
 }
 
 // API Routes
@@ -117,8 +132,13 @@ app.get('/api/health', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   const publicPath = path.join(process.cwd(), 'public');
   app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/socket.io')) {
+    // Skip API routes, uploads, socket.io, and static assets
+    if (
+      req.path.startsWith('/api') || 
+      req.path.startsWith('/uploads') || 
+      req.path.startsWith('/socket.io') ||
+      req.path.includes('.') // Skip requests for files with extensions (css, js, images, etc.)
+    ) {
       return next();
     }
     res.sendFile(path.join(publicPath, 'index.html'));
