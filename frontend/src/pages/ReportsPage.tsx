@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { format, subDays, startOfWeek, endOfWeek } from "date-fns";
+import { format, subDays } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowDownTrayIcon,

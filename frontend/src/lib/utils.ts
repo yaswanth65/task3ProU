@@ -94,7 +94,7 @@ export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: ReturnType<typeof setTimeout>;
   
   return function executedFunction(...args: Parameters<T>) {
     clearTimeout(timeout);

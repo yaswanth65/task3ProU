@@ -6,7 +6,6 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExclamationTriangleIcon,
-  ArrowTrendingUpIcon,
   CalendarIcon,
   PlusIcon,
   ArrowRightIcon,
@@ -37,7 +36,6 @@ const renderCustomLabel = ({
   cx,
   cy,
   midAngle,
-  innerRadius,
   outerRadius,
   name,
   value,
@@ -46,7 +44,6 @@ const renderCustomLabel = ({
   cx: number;
   cy: number;
   midAngle: number;
-  innerRadius: number;
   outerRadius: number;
   name: string;
   value: number;
@@ -76,7 +73,7 @@ const renderCustomLabel = ({
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const { tasks, loading, fetchTasks } = useTaskStore();
+  const { tasks, fetchTasks } = useTaskStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
@@ -167,7 +164,7 @@ export default function DashboardPage() {
   // Upcoming deadlines
   const upcomingTasks = useMemo(() => {
     return tasks
-      .filter((t) => t.dueDate && t.status !== "completed")
+      .filter((t) => t.dueDate && t.status !== "done")
       .sort(
         (a, b) =>
           new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
@@ -354,11 +351,11 @@ export default function DashboardPage() {
                       <PriorityBadge priority={task.priority} />
                     </div>
                   </div>
-                  {task.assignee && (
+                  {task.assignees && task.assignees.length > 0 && (
                     <Avatar
-                      src={task.assignee.avatar}
-                      firstName={task.assignee.firstName}
-                      lastName={task.assignee.lastName}
+                      src={task.assignees[0].avatar}
+                      firstName={task.assignees[0].firstName}
+                      lastName={task.assignees[0].lastName}
                       size="sm"
                     />
                   )}

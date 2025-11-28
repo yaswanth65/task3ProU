@@ -315,8 +315,7 @@ export default function CreateTaskModal({
                           </optgroup>
                         )}
                       </select>
-                      {currentUser?.role === "manager" ||
-                      currentUser?.role === "admin" ? (
+                      {currentUser?.role === "manager" ? (
                         <p className="mt-1 text-xs text-slate-500">
                           As a manager, you can assign tasks to yourself or any
                           team member

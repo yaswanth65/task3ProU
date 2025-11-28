@@ -26,7 +26,7 @@ import { PriorityBadge, StatusBadge } from "../components/ui/Badge";
 import { cn } from "../lib/utils";
 
 export default function CalendarPage() {
-  const { tasks, fetchTasks, loading } = useTaskStore();
+  const { tasks, fetchTasks } = useTaskStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);

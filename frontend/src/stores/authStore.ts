@@ -38,6 +38,7 @@ interface AuthState {
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
+  updateUser: (updates: Partial<User>) => void;
   completeOnboarding: () => Promise<void>;
   clearError: () => void;
 }
@@ -175,6 +176,12 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           // Ignore errors
         }
+      },
+      
+      updateUser: (updates: Partial<User>) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updates } : null,
+        }));
       },
       
       clearError: () => set({ error: null }),

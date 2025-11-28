@@ -18,7 +18,7 @@ import { cn } from "../lib/utils";
 type SettingsTab = "profile" | "notifications" | "security" | "appearance";
 
 export default function SettingsPage() {
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, updateProfile } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");

@@ -25,7 +25,7 @@ export default function TasksPage() {
   const { taskId } = useParams<{ taskId?: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { tasks, loading, fetchTasks, updateTask, deleteTask } = useTaskStore();
+  const { tasks, isLoading, fetchTasks } = useTaskStore();
 
   const [viewMode, setViewMode] = useState<ViewMode>("kanban");
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,10 +88,17 @@ export default function TasksPage() {
 
     // Assignee filter
     if (filters.assignee) {
-      if (filters.assignee === "me" && task.assignee?._id !== user?._id) {
+      if (
+        filters.assignee === "me" &&
+        !task.assignees?.some((a) => a._id === user?._id)
+      ) {
         return false;
       }
-      if (filters.assignee === "unassigned" && task.assignee) {
+      if (
+        filters.assignee === "unassigned" &&
+        task.assignees &&
+        task.assignees.length > 0
+      ) {
         return false;
       }
     }
@@ -108,16 +115,6 @@ export default function TasksPage() {
     setSelectedTask(task);
     setShowEditModal(true);
     navigate(`/tasks/${task._id}`);
-  };
-
-  const handleStatusChange = async (taskId: string, status: Task["status"]) => {
-    await updateTask(taskId, { status });
-  };
-
-  const handleDelete = async (taskId: string) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      await deleteTask(taskId);
-    }
   };
 
   const clearFilters = () => {
@@ -285,7 +282,7 @@ export default function TasksPage() {
 
       {/* Content */}
       <div className="flex-1">
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" />
           </div>
@@ -354,16 +351,16 @@ export default function TasksPage() {
                       {task.dueDate ? formatDate(task.dueDate) : "-"}
                     </td>
                     <td className="px-4 py-3">
-                      {task.assignee ? (
+                      {task.assignees && task.assignees.length > 0 ? (
                         <div className="flex items-center gap-2">
                           <Avatar
-                            src={task.assignee.avatar}
-                            firstName={task.assignee.firstName}
-                            lastName={task.assignee.lastName}
+                            src={task.assignees[0].avatar}
+                            firstName={task.assignees[0].firstName}
+                            lastName={task.assignees[0].lastName}
                             size="xs"
                           />
                           <span className="text-sm text-slate-600">
-                            {task.assignee.firstName}
+                            {task.assignees[0].firstName}
                           </span>
                         </div>
                       ) : (

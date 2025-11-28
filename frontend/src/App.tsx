@@ -15,7 +15,7 @@ import LoadingSpinner from "./components/ui/LoadingSpinner";
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, loading, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     verify();
   }, [checkAuth]);
 
-  if (checking || loading) {
+  if (checking || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -54,7 +54,7 @@ function ManagerRoute({ children }: { children: React.ReactNode }) {
 
 // Public route wrapper (redirect if already authenticated)
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, loading, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
     verify();
   }, [checkAuth]);
 
-  if (checking || loading) {
+  if (checking || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />

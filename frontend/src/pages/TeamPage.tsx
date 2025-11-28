@@ -11,7 +11,6 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Modal from "../components/ui/Modal";
 import { api } from "../lib/api";
-import { cn } from "../lib/utils";
 
 interface TeamMember {
   _id: string;
