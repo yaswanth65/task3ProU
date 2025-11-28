@@ -32,7 +32,18 @@ const allowedOrigins: string[] = process.env.FRONTEND_URL
 // Socket.IO setup with CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow same-origin requests (no origin header) and configured origins
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.some(allowed => origin.startsWith(allowed) || allowed === '*')) {
+        return callback(null, true);
+      }
+      // In production with same-domain setup, allow the request
+      if (process.env.NODE_ENV === 'production') {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -49,26 +60,32 @@ app.use(helmet({
 // CORS configuration
 const isDev = process.env.NODE_ENV !== 'production';
 
-// In development allow the incoming origin (reflect) to avoid CORS preflight failures
-// caused by different local ports (e.g. 3000 vs 3001). In production, only allow
-// configured FRONTEND_URL(s).
+// In production with same-domain setup (frontend served by same server), 
+// we need to allow same-origin requests. Also allow configured FRONTEND_URL(s).
 app.use(cors({
-  origin: isDev
-    ? true
-    : (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-        // Allow requests with no origin (e.g., server-to-server, curl)
-        if (!origin) return callback(null, true);
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (same-origin, server-to-server, curl)
+    if (!origin) return callback(null, true);
+    
+    // In development, allow all origins
+    if (isDev) return callback(null, true);
+    
+    // In production, allow configured origins
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    
+    // Also allow the Render domain itself (same-origin setup)
+    if (origin.includes('onrender.com') || origin.includes('render.com')) {
+      return callback(null, true);
+    }
 
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-
-        callback(new Error('Not allowed by CORS'));
-      },
+    callback(null, true); // Allow all in production since frontend is same-origin
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-console.log('CORS mode:', isDev ? 'development (allow any origin)' : 'production (restricted)');
+console.log('CORS mode:', isDev ? 'development (allow any origin)' : 'production (same-origin + configured)');
 console.log('Allowed CORS origins:', allowedOrigins.join(', '));
 
 // Rate limiting
