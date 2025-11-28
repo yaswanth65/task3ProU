@@ -33,7 +33,7 @@ services:
       - key: PORT
         value: 10000
       - key: MONGODB_URI
-        sync: false  # Set this manually in Render dashboard (use MongoDB Atlas)
+        sync: false # Set this manually in Render dashboard (use MongoDB Atlas)
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -48,7 +48,6 @@ services:
     healthCheckPath: /api/health
     # Auto-deploy on push to main branch
     autoDeploy: true
-
 # =============================================================================
 # IMPORTANT: MongoDB Setup
 # =============================================================================
