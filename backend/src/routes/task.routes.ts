@@ -29,8 +29,8 @@ router.get(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const filters = {
-        status: req.query.status as string,
-        priority: req.query.priority as string,
+        status: req.query.status as string | undefined,
+        priority: req.query.priority as string | undefined,
         assignee: req.query.assignee as string,
         tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
         search: req.query.search as string,
@@ -46,7 +46,7 @@ router.get(
         sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
       };
       
-      const result = await taskService.getTasks(filters, options);
+      const result = await taskService.getTasks(filters as Parameters<typeof taskService.getTasks>[0], options);
       res.json(result);
     } catch (error) {
       console.error('Get tasks error:', error);

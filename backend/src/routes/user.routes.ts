@@ -25,7 +25,7 @@ router.get(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const filters = {
-        role: req.query.role as string,
+        role: req.query.role as string | undefined,
         department: req.query.department as string,
         search: req.query.search as string,
         isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
@@ -38,7 +38,7 @@ router.get(
         sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'asc',
       };
       
-      const result = await userService.getUsers(filters, options);
+      const result = await userService.getUsers(filters as Parameters<typeof userService.getUsers>[0], options);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: 'Failed to get users' });

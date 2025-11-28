@@ -86,10 +86,10 @@ router.get(
           `"${(task.title || '').replace(/"/g, '""')}"`,
           task.status,
           task.priority,
-          `"${(task.assignees as Array<{ firstName: string; lastName: string }>)
+          `"${(task.assignees as unknown as Array<{ firstName: string; lastName: string }>)
             .map((a) => `${a.firstName} ${a.lastName}`)
             .join(', ')}"`,
-          `"${(task.createdBy as { firstName: string; lastName: string })?.firstName || ''} ${(task.createdBy as { firstName: string; lastName: string })?.lastName || ''}"`,
+          `"${(task.createdBy as unknown as { firstName: string; lastName: string })?.firstName || ''} ${(task.createdBy as unknown as { firstName: string; lastName: string })?.lastName || ''}"`,
           task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
           new Date(task.createdAt).toISOString(),
           task.completedAt ? new Date(task.completedAt).toISOString() : '',
